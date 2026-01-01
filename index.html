@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gothic Cathedral Experience</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+}
+
+.scene {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.scene.active {
+    opacity: 1;
+}
+
+#door {
+    background-image: url("door.jpg");
+    cursor: pointer;
+}
+
+#cathedral {
+    background-image: url("cathedral.jpg");
+}
+
+#altar {
+    background-image: url("altar.jpg");
+}
+</style>
+</head>
+<body>
+
+<!-- Scenes -->
+<div id="cathedral" class="scene active"></div>
+<div id="door" class="scene"></div>
+<div id="altar" class="scene"></div>
+
+<!-- Sounds -->
+<audio id="knock">
+    <source src="knock.mp3" type="audio/mpeg">
+</audio>
+<audio id="creak">
+    <source src="creak.mp3" type="audio/mpeg">
+</audio>
+<audio id="chant" loop>
+    <source src="chant.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let stage = 0; // current click stage
+const scenes = ["cathedral", "door", "altar"];
+
+document.body.addEventListener("click", () => {
+    const knock = document.getElementById("knock");
+    const creak = document.getElementById("creak");
+    const chant = document.getElementById("chant");
+
+    if (stage === 0) {
+        // Click 1: Cathedral -> Door
+        document.getElementById(scenes[stage]).classList.remove("active");
+        stage++;
+        document.getElementById(scenes[stage]).classList.add("active");
+    } else if (stage === 1) {
+        // Click 2: Play knock only
+        knock.currentTime = 0;
+        knock.play().catch(() => {});
+        stage++; // next click will open door
+    } else if (stage === 2) {
+        // Click 3: Play creak AND immediately transition to altar
+        creak.currentTime = 0;
+        creak.play().catch(() => {});
+
+        // Transition scenes immediately
+        document.getElementById("door").classList.remove("active");
+        document.getElementById("altar").classList.add("active");
+
+        // Play chanting
+        chant.currentTime = 0;
+        chant.play().catch(() => {});
+
+        stage++; // all done
+    }
+});
+</script>
+
+</body>
+</html>
