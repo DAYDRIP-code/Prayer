@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gothic Cathedral Experience</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+}
+
+.scene {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.scene.active {
+    opacity: 1;
+}
+
+#door {
+    background-image: url("door.jpg");
+    cursor: pointer;
+}
+
+#cathedral {
+    background-image: url("cathedral.jpg");
+}
+
+#altar {
+    background-image: url("altar.jpg");
+}
+</style>
+</head>
+<body>
+
+<!-- Scenes -->
+<div id="cathedral" class="scene active"></div>
+<div id="door" class="scene"></div>
+<div id="altar" class="scene"></div>
+
+<!-- Sounds -->
+<audio id="knock">
+    <source src="knock.mp3" type="audio/mpeg">
+</audio>
+<audio id="creak">
+    <source src="creak.mp3" type="audio/mpeg">
+</audio>
+<audio id="chant" loop>
+    <source src="chant.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let stage = 0; // click stage
+const scenes = ["cathedral", "door", "altar"];
+
+document.body.addEventListener("click", () => {
+    const knock = document.getElementById("knock");
+    const creak = document.getElementById("creak");
+    const chant = document.getElementById("chant");
+
+    if (stage === 0) {
+        // Click 1: Cathedral -> Door
+        document.getElementById(scenes[stage]).classList.remove("active");
+        stage++;
+        document.getElementById(scenes[stage]).classList.add("active");
+    } else if (stage === 1) {
+        // Click 2: Knock sound
+        knock.currentTime = 0;
+        knock.play().catch(() => {});
+        // Wait for knock to finish before allowing next stage
+        knock.onended = () => {
+            stage++; // now ready for next click
+        };
+    } else if (stage === 2) {
+        // Click 3: Creak + open door -> Altar
+        creak.currentTime = 0;
+        creak.play().catch(() => {});
+        // After creak ends, show altar and start chanting
+        creak.onended = () => {
+            document.getElementById(scenes[stage]).classList.remove("active"); // door
+            stage++;
+            document.getElementById(scenes[stage]).classList.add("active"); // altar
+            chant.currentTime = 0;
+            chant.play().catch(() => {});
+        };
+    }
+});
+</script>
+
+</body>
+</html>
