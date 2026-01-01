@@ -20,7 +20,7 @@ html, body {
     transition: opacity 1.5s ease;
     background-repeat: no-repeat;
     background-position: center;
-    background-size: contain; /* full image visible */
+    background-size: contain;
 }
 
 .scene.active {
@@ -48,36 +48,47 @@ html, body {
 <div id="door" class="scene"></div>
 <div id="altar" class="scene"></div>
 
-<!-- Audio -->
-<audio id="ambient" loop>
-    <source src="ambient.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
+<!-- Sounds -->
+<audio id="knock">
+    <source src="knock.mp3" type="audio/mpeg">
+</audio>
+<audio id="creak">
+    <source src="creak.mp3" type="audio/mpeg">
+</audio>
+<audio id="chant" loop>
+    <source src="chant.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 const scenes = ["cathedral", "door", "altar"];
 let index = 0;
-let audioStarted = false;
 
 document.body.addEventListener("click", () => {
-    // Start audio on first click
-    if (!audioStarted) {
-        const audio = document.getElementById("ambient");
-        audio.volume = 0.6;
-        audio.loop = true;
-        audio.play().then(() => {
-            console.log("Audio started successfully");
-        }).catch((err) => {
-            console.error("Audio failed to play:", err);
-        });
-        audioStarted = true;
-    }
+    const knock = document.getElementById("knock");
+    const creak = document.getElementById("creak");
+    const chant = document.getElementById("chant");
 
-    // Advance scenes
-    if (index < scenes.length - 1) {
+    if (index === 0) {
+        // First click: cathedral → door
         document.getElementById(scenes[index]).classList.remove("active");
         index++;
         document.getElementById(scenes[index]).classList.add("active");
+    } else if (index === 1) {
+        // Click on door: knock → creak → altar
+        knock.play().catch(() => {});
+        // Delay creak slightly so it feels like door opening
+        setTimeout(() => {
+            creak.play().catch(() => {});
+        }, 500); // 0.5s after knock
+
+        // Transition to altar slightly after creak starts
+        setTimeout(() => {
+            document.getElementById(scenes[index]).classList.remove("active");
+            index++;
+            document.getElementById(scenes[index]).classList.add("active");
+            // Play chanting once altar is visible
+            chant.play().catch(() => {});
+        }, 1000); // 1s after knock
     }
 });
 </script>
