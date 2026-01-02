@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gothic Cathedral Experience</title>
+
+<!-- Gothic Font -->
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+}
+
+/* Scene styling */
+.scene {
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    z-index: 1;
+}
+
+.scene.active {
+    opacity: 1;
+}
+
+#door {
+    background-image: url("door.jpg");
+    cursor: pointer;
+}
+
+#cathedral {
+    background-image: url("cathedral.jpg");
+}
+
+#altar {
+    background-image: url("altar.jpg");
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+/* Gothic Text Overlay (Bottom, Blood Red) */
+.gothic-text {
+    position: fixed;
+    bottom: 12px;          /* bottom of the screen */
+    width: 100%;
+    text-align: center;
+    font-family: 'UnifrakturCook', serif;
+    color: #5b0f0f;        /* dark blood red */
+    font-size: 2rem;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 12px rgba(0,0,0,0.9);
+    z-index: 2;
+    opacity: 1;             /* fully visible initially */
+    transition: opacity 1.5s ease; /* fade out smoothly */
+    pointer-events: none;   /* does not block clicks */
+}
+
+/* Hidden Chat Link */
+.confessional-link {
+    position: fixed;
+    bottom: 12px;
+    right: 16px;
+    font-family: 'UnifrakturCook', serif;
+    font-size: 0.7rem;
+    color: #5b0f0f;
+    text-decoration: none;
+    opacity: 0.55;
+    z-index: 3;
+}
+
+.confessional-link:hover {
+    opacity: 1;
+    text-shadow: 0 0 6px rgba(120,0,0,0.8);
+}
+
+/* Video styling */
+#openingVideo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+    z-index: 5;
+    background: black;
+    opacity: 1;
+    transition: opacity 1s ease;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Gothic Text -->
+<div id="gothicText" class="gothic-text">
+  <p>Welcome, pilgrim of dust and breath.</p>
+  <p>You have crossed into the Universal Cathedral,</p>
+  <p>where doctrines are left at the door,</p>
+  <p>and sinners gather as one beneath the weight of eternity.</p>
+</div>
+
+<!-- Chat Link -->
+<a href="chat.html" class="confessional-link">enter the confessional</a>
+
+<!-- Scenes -->
+<div id="cathedral" class="scene active"></div>
+<div id="door" class="scene"></div>
+<div id="altar" class="scene"></div>
+
+<!-- Video -->
+<video id="openingVideo" preload="auto">
+  <source src="opening.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<!-- Sounds -->
+<audio id="knock">
+    <source src="knock.mp3" type="audio/mpeg">
+</audio>
+<audio id="creak">
+    <source src="creak.mp3" type="audio/mpeg">
+</audio>
+<audio id="chant" loop>
+    <source src="chant.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let stage = 0;
+
+const cathedral = document.getElementById("cathedral");
+const door = document.getElementById("door");
+const altar = document.getElementById("altar");
+const knock = document.getElementById("knock");
+const creak = document.getElementById("creak");
+const chant = document.getElementById("chant");
+const video = document.getElementById("openingVideo");
+const gothicText = document.getElementById("gothicText");
+
+document.body.addEventListener("click", () => {
+    if (stage === 0) {
+        // Fade out Gothic text
+        gothicText.style.opacity = 0;
+
+        // Wait for fade duration before showing the door
+        setTimeout(() => {
+            cathedral.classList.remove("active");
+            door.classList.add("active");
+            stage++;
+        }, 1500); // matches CSS transition
+    } else if (stage === 1) {
+        // Knock sound only
+        knock.currentTime = 0;
+        knock.play().catch(() => {});
+        stage++;
+    } else if (stage === 2) {
+        // Play creak + video
+        creak.currentTime = 0;
+        creak.play().catch(() => {});
+
+        // Hide door immediately
+        door.classList.remove("active");
+
+        // Show video
+        video.style.display = "block";
+        video.style.opacity = 1;
+        video.currentTime = 0;
+        video.play().catch(() => {});
+
+        video.onended = () => {
+            video.style.opacity = 0;
+            setTimeout(() => {
+                video.style.display = "none";
+                altar.classList.add("active");
+                altar.style.opacity = 1;
+                chant.currentTime = 0;
+                chant.play().catch(() => {});
+            }, 1000);
+        };
+
+        stage++;
+    }
+});
+</script>
+
+</body>
+</html>
+
